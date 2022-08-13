@@ -32,6 +32,11 @@ const Button = ({ text, eventHandler, colour }) => {
 }
 
 const Statistics = ({ statistics }) => {
+
+    if (statistics.total === 0) {
+        return <p>No feedback given</p>
+    }
+
   return (
     <table>
       <tbody>
