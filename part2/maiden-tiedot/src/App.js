@@ -5,9 +5,8 @@ import Countries from "./components/Countries"
 
 const App = () => {
   const [countries, setCountries] = useState([])
-  const [filter, setFilter] = useState([])
-  console.log(countries)
-  let countriesToShow = []
+  const [countriesToShow, setCountriesToShow] = useState([])
+  // const [countryToShow, setCountryToShow] = useState([])
 
   useEffect(() => {
     axios.get("https://restcountries.com/v3.1/all").then((response) => {
@@ -16,20 +15,43 @@ const App = () => {
     })
   }, [])
 
-  
-
   const handleFilterChange = (event) => {
-    setFilter(event.target.value.toLowerCase())
-    console.log(event.target.value);
-    console.log("FILTTERI", filter);
+    setCountriesToShow(
+      countries.filter((c) =>
+        c.name.common.toLowerCase().includes(event.target.value.toLowerCase())
+      )
+    )
+    console.log("EVENTTI", event.target.value)
   }
 
+  // const showCountry = (event) => {
+  //   event.preventDefault()
+  //   console.log("submit");
+  //   console.log(countryToShow);
+    // setCountriesToShow(
+    //   countries.filter((c) =>
+    //     c.name.common.toLowerCase().includes(countryToShow)
+    //   )
+    // )
+  // }
+
+  const handleShowChange = (event) => {
+    setCountriesToShow(
+      countries.filter((c) =>
+        c.name.common.toLowerCase().includes(event.target.value.toLowerCase())
+      )
+    )
+  }
 
   return (
     <div>
-      <h1>Country database (REST API)</h1>
-      <Filter handleChange={handleFilterChange}/>
-      <Countries countries={countries} filter={filter}/>
+      <h1>Country database (by REST API)</h1>
+      <Filter handleChange={handleFilterChange} />
+      <Countries
+        countriesToShow={countriesToShow}
+        // showCountry={showCountry}
+        handleShowChange={handleShowChange}
+      />
     </div>
   )
 }
