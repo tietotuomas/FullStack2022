@@ -46,10 +46,10 @@ const App = () => {
           }, 5000)
         })
         .catch((error) => {
-          console.log(error)
           setErrorMessage(
             `${personToBeDeleted.name} was already removed from the server`
           )
+          setPersons(persons.filter(p => p.id !== personToBeDeleted.id))
           setTimeout(() => {
             setErrorMessage("")
           }, 5000)
@@ -92,6 +92,7 @@ const App = () => {
             setErrorMessage(
               `${personWithTheSameName.name} was already removed from the server`
             )
+            setPersons(persons.filter(p => p.id !== personWithTheSameName.id))
             setTimeout(() => {
               setErrorMessage("")
             }, 5000)
