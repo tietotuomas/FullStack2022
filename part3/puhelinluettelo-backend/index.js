@@ -1,8 +1,13 @@
-const { response } = require("express")
 const express = require("express")
+const morgan = require("morgan")
 const app = express()
 
 app.use(express.json())
+morgan.token('person', (req, res) => {
+  return JSON.stringify(req.body)
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
+
 
 let persons = [
   { id: 1, name: "Arto Hellas", number: "040-123456" },
@@ -24,44 +29,49 @@ app.get("/api/persons", (req, res) => {
 })
 
 app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id)
-    const person = persons.find(p => p.id === id )
-    if (person) {
-        res.json(person)
-    }
-    else {
-        res.status(404).end()
-    }
-    
+  const id = Number(req.params.id)
+  const person = persons.find((p) => p.id === id)
+  if (person) {
+    res.json(person)
+  } else {
+    res.status(404).end()
+  }
 })
 
 app.delete("/api/persons/:id", (req, res) => {
-    console.log(req.params.id);
-    const id = Number(req.params.id)
-    const person = persons.find(p => p.id === id)
-    if (person) {
-        persons = persons.filter(p => p.id !== id)
-        res.status(204).end()
-    }
-    else {
-        res.status(404).end()
-    }
+  const id = Number(req.params.id)
+  const person = persons.find((p) => p.id === id)
+  if (person) {
+    persons = persons.filter((p) => p.id !== id)
+    res.status(204).end()
+  } else {
+    res.status(404).end()
+  }
 })
 
 app.post("/api/persons", (req, res) => {
-    console.log(req.body);
-    const person = req.body
-    person.id = generateId()
-    persons.concat(person)
-    res.json(person)
+  const person = req.body
+  if (!person.name) {
+    return res.json({ error: "Name cannot be left empty." })
+  }
+  if (!person.number) {
+    return res.json({ error: "Number cannot be left empty." })
+  }
+
+  if (persons.find((p) => p.name === person.name)) {
+    return res.json({ error: "Name must be unique." })
+  }
+  person.id = generateId()
+  persons = persons.concat(person)
+  res.json(person)
 })
 
 const generateId = () => {
-    let id = 1
-    while (persons.find(p => p.id === id)) {
-        id = Math.floor(Math.random()*1000)
-    }
-    return id
+  let id = 1
+  while (persons.find((p) => p.id === id)) {
+    id = Math.floor(Math.random() * 1000)
+  }
+  return id
 }
 
 const PORT = 3001
