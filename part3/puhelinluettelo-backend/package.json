@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build:front": "rm -rf build && cd ../puhelinluettelo-frontend/ && npm run build && cp -r build ../puhelinluettelo-backend",
+    "deploy": "flyctl deploy",
+    "deploy:full": "npm run build:front && npm run deploy"
   },
   "author": "tietotuomas",
   "license": "MIT",
