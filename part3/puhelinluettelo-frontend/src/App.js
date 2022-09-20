@@ -49,7 +49,7 @@ const App = () => {
           setErrorMessage(
             `${personToBeDeleted.name} was already removed from the server`
           )
-          setPersons(persons.filter(p => p.id !== personToBeDeleted.id))
+          setPersons(persons.filter((p) => p.id !== personToBeDeleted.id))
           setTimeout(() => {
             setErrorMessage("")
           }, 5000)
@@ -92,7 +92,7 @@ const App = () => {
             setErrorMessage(
               `${personWithTheSameName.name} was already removed from the server`
             )
-            setPersons(persons.filter(p => p.id !== personWithTheSameName.id))
+            setPersons(persons.filter((p) => p.id !== personWithTheSameName.id))
             setTimeout(() => {
               setErrorMessage("")
             }, 5000)
@@ -100,15 +100,23 @@ const App = () => {
       }
     } else {
       const newPerson = { name: newName, number: newNumber }
-      personService.createNew(newPerson).then((newPerson) => {
-        setPersons(persons.concat(newPerson))
-        setNewName("")
-        setNewNumber("")
-        setMessage(`${newPerson.name}'s information was successfully added`)
-        setTimeout(() => {
-          setMessage("")
-        }, 5000)
-      })
+      personService
+        .createNew(newPerson)
+        .then((newPerson) => {
+          setPersons(persons.concat(newPerson))
+          setNewName("")
+          setNewNumber("")
+          setMessage(`${newPerson.name}'s information was successfully added`)
+          setTimeout(() => {
+            setMessage("")
+          }, 5000)
+        })
+        .catch((error) => {
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {
+            setErrorMessage("")
+          }, 5000)
+        })
     }
   }
 
