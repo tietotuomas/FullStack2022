@@ -115,12 +115,12 @@ describe('after posting a new blog', () => {
   test('likes will be set to 0 if left empty', async () => {
     const blogWithoutLikes = { ...newBlog }
     delete blogWithoutLikes.likes
-    post_response = await api
+    const post_response = await api
       .post('/api/blogs')
       .send(blogWithoutLikes)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-    get_response = await api.get('/api/blogs')
+    const get_response = await api.get('/api/blogs')
     const fetchedBlog = get_response.body.find(
       (b) =>
         b.title ===
@@ -131,22 +131,23 @@ describe('after posting a new blog', () => {
   test('without a title the saving process fails and server responds with the status code 400 - Bad Request', async () => {
     const blogWithoutTitle = { ...newBlog }
     delete blogWithoutTitle.title
-    post_response = await api
+    const post_response = await api
       .post('/api/blogs')
       .send(blogWithoutTitle)
       .expect(400)
       .expect('Content-Type', /application\/json/)
-    get_response = await api.get('/api/blogs')
+    const get_response = await api.get('/api/blogs')
     expect(get_response.body).toHaveLength(blogs.length)
   })
   test('without a url the saving process fails and server responds with the status code 400 - Bad Request', async () => {
     const blogWithoutUrl = { ...newBlog }
     delete blogWithoutUrl.url
-    post_response = await api
+    const post_response = await api
       .post('/api/blogs')
       .send(blogWithoutUrl)
       .expect(400)
       .expect('Content-Type', /application\/json/)
+    const get_response = await api.get('/api/blogs')
     expect(get_response.body).toHaveLength(blogs.length)
   })
 })
