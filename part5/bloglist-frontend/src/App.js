@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
-import Login from './components/Login'
-import NewBlog from './components/NewBlog'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import Notificiation from './components/Notification'
+import Togglable from './components/Togglable'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -13,9 +15,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [message, setMessage] = useState(null)
   const [errorMessage, setErrorMessage] = useState(true)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   console.log('rendering App..')
 
@@ -68,23 +67,16 @@ const App = () => {
     window.localStorage.removeItem('loggedInUser')
   }
 
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
+  const createNewBlog = async (blog) => {
+    console.log("create new blog");
     try {
-      const newBlog = await blogService.create({
-        title: title,
-        author: author,
-        url: url,
-      })
+      const newBlog = await blogService.create(blog)
       setBlogs(blogs.concat(newBlog))
       setErrorMessage(false)
-      setMessage(`A new blog added: ${title} by ${author}`)
+      setMessage(`A new blog added: ${newBlog.title} by ${newBlog.author}`)
       setTimeout(() => {
         setMessage(null)
       }, 5000)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
     } catch (exception) {
       console.log(exception)
       setErrorMessage(true)
@@ -107,16 +99,10 @@ const App = () => {
             {user.name === undefined ? user.username : user.name}, you are
             logged in.
           </h3>
+          <Togglable buttonLabel="New blog">
+            <BlogForm createNewBlog={createNewBlog} />
+          </Togglable>
 
-          <NewBlog
-            handleNewBlog={handleNewBlog}
-            title={title}
-            setTitle={setTitle}
-            author={author}
-            setAuthor={setAuthor}
-            url={url}
-            setUrl={setUrl}
-          />
           <br />
 
           {blogs.map((blog) => (
@@ -130,7 +116,7 @@ const App = () => {
         </div>
       ) : (
         <div>
-          <Login
+          <LoginForm
             username={username}
             setUsername={setUsername}
             password={password}

@@ -1,18 +1,27 @@
-const Login = ({ username, setUsername, password, setPassword, handleLogin }) => {
+const LoginForm = ({
+  username,
+  setUsername,
+  password,
+  setPassword,
+  handleLogin,
+}) => {
   console.log('rendering Login...')
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div>
+          username:
           <input
             type="text"
             name="Text"
             value={username}
+            label="username"
             onChange={({ target }) => setUsername(target.value)}
           />
         </div>
         <div>
+          password:
           <input
             type="password"
             name="Password"
@@ -26,4 +35,4 @@ const Login = ({ username, setUsername, password, setPassword, handleLogin }) =>
   )
 }
 
-export default Login
+export default LoginForm

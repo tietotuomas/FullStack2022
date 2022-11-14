@@ -1,12 +1,17 @@
-const NewBlog = ({
-  handleNewBlog,
-  title,
-  setTitle,
-  author,
-  setAuthor,
-  url,
-  setUrl,
-}) => {
+import { useState } from 'react'
+const BlogForm = ({ createNewBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleNewBlog = (event) => {
+    event.preventDefault()
+    createNewBlog({ title: title, author: author, url: url })
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
+
   return (
     <div>
       <h4>Send a new blog</h4>
@@ -44,4 +49,4 @@ const NewBlog = ({
   )
 }
 
-export default NewBlog
+export default BlogForm
