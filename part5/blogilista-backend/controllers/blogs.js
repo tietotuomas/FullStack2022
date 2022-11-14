@@ -1,12 +1,12 @@
-const blogRouter = require('express').Router()
+const router = require('express').Router()
 const Blog = require('../models/blog')
 
-blogRouter.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   res.json(blogs)
 })
 
-blogRouter.post('/', async (req, res) => {
+router.post('/', async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ error: 'Missing or invalid token.' })
   }
@@ -26,7 +26,7 @@ blogRouter.post('/', async (req, res) => {
   res.status(201).json(savedBlog)
 })
 
-blogRouter.delete('/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
   const id = req.params.id
   const blog = await Blog.findById(id)
   if (!blog) {
@@ -42,7 +42,7 @@ blogRouter.delete('/:id', async (req, res) => {
   res.status(204).end()
 })
 
-blogRouter.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
   console.log(req.user);
   const id = req.params.id
   const body = req.body
@@ -54,5 +54,5 @@ blogRouter.put('/:id', async (req, res) => {
 
   res.json(updatedBlog)
 })
-//router, not blogRouter?
-module.exports = blogRouter
+
+module.exports = router
