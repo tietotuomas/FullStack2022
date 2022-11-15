@@ -41,7 +41,6 @@ const errorHandler = (error, req, res, next) => {
   logger.error('Errorhandler:')
   logger.error(error.message)
 
-  //why .send, not .json
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'Malformatted id.' })
   }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
@@ -31,6 +31,8 @@ const App = () => {
       console.log('useEffect setToken')
     }
   }, [])
+
+  const blogFormRef = useRef()
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -67,11 +69,33 @@ const App = () => {
     window.localStorage.removeItem('loggedInUser')
   }
 
+  const addLike = async (blog) => {
+    const blogWithAddedLike = { ...blog, likes: blog.likes + 1 }
+    try {
+      const updatedBlog = await blogService.update(blogWithAddedLike)
+      // cant use updatedBlog because user in different (not populated) form
+      const updatedBlogs = blogs.map((b) =>
+        b.id === blog.id ? blogWithAddedLike : b
+      )
+      setBlogs(updatedBlogs)
+    } catch (exception) {
+      console.log(exception)
+      setErrorMessage(true)
+      exception.message === undefined
+        ? setMessage(`Updating the blog didn't succeed`)
+        : setMessage(exception.message)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
   const createNewBlog = async (blog) => {
-    console.log("create new blog");
+    console.log('create new blog')
     try {
       const newBlog = await blogService.create(blog)
-      setBlogs(blogs.concat(newBlog))
+      setBlogs(blogs.concat({ ...newBlog, user: user }))
+      blogFormRef.current.toggleVisibility()
       setErrorMessage(false)
       setMessage(`A new blog added: ${newBlog.title} by ${newBlog.author}`)
       setTimeout(() => {
@@ -89,6 +113,34 @@ const App = () => {
     }
   }
 
+  const removeBlog = async (blog) => {
+    const confirm = window.confirm(`Remove ${blog.title} by ${blog.author}?`)
+    if (confirm) {
+      try {
+        const response = await blogService.remove(blog.id)
+        console.log(response)
+        const newBlogs = blogs.filter((b) => b.id !== blog.id)
+        setBlogs(newBlogs)
+        setErrorMessage(false)
+        setMessage(
+          `The blog ${blog.title} by ${blog.author} was successfully deleted.`
+        )
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      } catch (exception) {
+        console.log(exception)
+        setErrorMessage(true)
+        exception.message === undefined
+          ? setMessage(`Removing the blog didn't succeed`)
+          : setMessage(exception.message)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      }
+    }
+  }
+
   return (
     <div>
       <Notificiation message={message} errorMessage={errorMessage} />
@@ -99,15 +151,23 @@ const App = () => {
             {user.name === undefined ? user.username : user.name}, you are
             logged in.
           </h3>
-          <Togglable buttonLabel="New blog">
+          <Togglable buttonLabel="New blog" ref={blogFormRef}>
             <BlogForm createNewBlog={createNewBlog} />
           </Togglable>
 
           <br />
 
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
+          {blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                user={user}
+                addLike={addLike}
+                removeBlog={removeBlog}
+              />
+            ))}
           <br />
 
           <button type="submit" onClick={handleLogout}>

@@ -33,9 +33,8 @@ router.delete('/:id', async (req, res) => {
     return res.status(204).end()
   }
   // blogToDelete.user &&
-  console.log('id or _id:')
-  console.log(req.user.id)
-  if (blog.user.toString() !== req.user._id.toString()) {
+  console.log('delete by req.user.id:', req.user.id)
+  if (blog.user.toString() !== req.user.id.toString()) {
     return res.status(401).json({ error: 'Not authorized to delete the blog.' })
   }
   await Blog.deleteOne(blog)
@@ -43,13 +42,14 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.put('/:id', async (req, res) => {
-  console.log(req.user);
   const id = req.params.id
-  const body = req.body
-
-  const blog = { ...body, user: req.user._id }
-
-  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, { new: true })
+  const blog = {...req.body, user: req.body.user.id}
+  console.log({blog});
+  const updatedBlog = await Blog.findByIdAndUpdate(id, blog, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  })
   console.log({ updatedBlog })
 
   res.json(updatedBlog)
