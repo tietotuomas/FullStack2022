@@ -72,8 +72,10 @@ const App = () => {
   const addLike = async (blog) => {
     const blogWithAddedLike = { ...blog, likes: blog.likes + 1 }
     try {
+      /*eslint-disable */
       const updatedBlog = await blogService.update(blogWithAddedLike)
       // cant use updatedBlog because user in different (not populated) form
+      /*eslint-enable */
       const updatedBlogs = blogs.map((b) =>
         b.id === blog.id ? blogWithAddedLike : b
       )
@@ -82,7 +84,7 @@ const App = () => {
       console.log(exception)
       setErrorMessage(true)
       exception.message === undefined
-        ? setMessage(`Updating the blog didn't succeed`)
+        ? setMessage('Updating the blog didn\'t succeed')
         : setMessage(exception.message)
       setTimeout(() => {
         setMessage(null)
@@ -105,7 +107,7 @@ const App = () => {
       console.log(exception)
       setErrorMessage(true)
       exception.message === undefined
-        ? setMessage(`Adding a new blog didn't succeed`)
+        ? setMessage('Adding a new blog didn\'t succeed')
         : setMessage(exception.message)
       setTimeout(() => {
         setMessage(null)
@@ -132,7 +134,7 @@ const App = () => {
         console.log(exception)
         setErrorMessage(true)
         exception.message === undefined
-          ? setMessage(`Removing the blog didn't succeed`)
+          ? setMessage('Removing the blog didn\'t succeed')
           : setMessage(exception.message)
         setTimeout(() => {
           setMessage(null)

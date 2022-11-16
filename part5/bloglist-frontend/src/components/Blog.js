@@ -51,6 +51,6 @@ Blog.propTypes = {
   blog: Proptypes.object.isRequired,
   addLike: Proptypes.func.isRequired,
   removeBlog: Proptypes.func.isRequired,
-  user: Proptypes.object.isRequired  
+  user: Proptypes.object.isRequired,
 }
 export default Blog
