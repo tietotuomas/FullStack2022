@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
-import Notificiation from './components/Notification'
+import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
 import blogService from './services/blogs'
@@ -143,7 +143,7 @@ const App = () => {
 
   return (
     <div>
-      <Notificiation message={message} errorMessage={errorMessage} />
+      <Notification message={message} errorMessage={errorMessage} />
       {user !== null ? (
         <div>
           <h2>Blogs</h2>
