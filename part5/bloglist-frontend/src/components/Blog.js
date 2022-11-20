@@ -24,17 +24,28 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
     <div style={blogStyle}>
       <b>
         {blog.title} - {blog.author}{' '}
-        <button style={hideWhenVisible} onClick={toggleVisibility}>
+        <button
+          id="showButton"
+          style={hideWhenVisible}
+          onClick={toggleVisibility}
+        >
           show
         </button>
-        <button style={showWhenVisible} onClick={toggleVisibility}>
+        <button
+          id="hideButton"
+          style={showWhenVisible}
+          onClick={toggleVisibility}
+        >
           hide
         </button>
       </b>
-      <div style={showWhenVisible}>
-        {blog.url}
+      <div className="details" style={showWhenVisible}>
+        <span id="url">{blog.url}</span>
         <br></br>
-        Likes: {blog.likes} <button onClick={() => addLike(blog)}>like</button>
+        Likes: <span id="likes">{blog.likes}</span>{' '}
+        <button id="likeButton" onClick={() => addLike(blog)}>
+          like
+        </button>
         <br></br>
         Added by:{' '}
         {blog.user.name === undefined ? blog.user.username : blog.user.name}
