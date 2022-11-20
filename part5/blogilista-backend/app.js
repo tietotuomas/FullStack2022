@@ -7,6 +7,7 @@ require('express-async-errors')
 const blogRouter = require('./controllers/blogs')
 const userRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 
@@ -29,6 +30,10 @@ app.use(middleware.requestLogger)
 app.use('/api/blogs', middleware.userExtractor, blogRouter)
 app.use('/api/users', userRouter)
 app.use('/login', loginRouter)
+if (process.env.NODE_ENV === 'test') {
+  const resetRouter = require('./controllers/reset')
+  app.use('/api/testing', resetRouter)
+}
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
