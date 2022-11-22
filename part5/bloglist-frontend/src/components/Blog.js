@@ -23,7 +23,7 @@ const Blog = ({ blog, addLike, removeBlog, user }) => {
   return (
     <div style={blogStyle}>
       <b>
-        {blog.title} - {blog.author}{' '}
+        <span className='blog'>{blog.title} - {blog.author}{' '}</span>
         <button
           id="showButton"
           style={hideWhenVisible}
