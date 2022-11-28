@@ -1,5 +1,6 @@
 import { useDispatch } from 'react-redux'
 import { create } from '../reducers/anecdoteReducer'
+import { showMessage, clearMessage } from '../reducers/notificationReducer'
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
@@ -9,6 +10,10 @@ const AnecdoteList = () => {
     event.target.content.value = ''
     console.log('send form', anecdote)
     dispatch(create(anecdote))
+    dispatch(showMessage(`You added anecdote "${anecdote}"`))
+    setTimeout(() => {
+      dispatch(clearMessage())
+    }, 5000)
   }
   return (
     <div>
