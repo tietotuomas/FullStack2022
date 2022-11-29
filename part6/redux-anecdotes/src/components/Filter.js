@@ -4,7 +4,6 @@ import { editFilter } from '../reducers/filterReducer'
 const Filter = () => {
 const dispatch = useDispatch()
   const handleChange = (event) => {
-    // input-kentän arvo muuttujassa event.target.value
     console.log(event.target.value)
     dispatch(editFilter(event.target.value))
   }
