@@ -10,17 +10,20 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/user'
 
+import { useDispatch, useSelector } from 'react-redux'
+import { createNotification } from './reducers/notificationReducer'
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
+  // const [notification, setNotification] = useState(null)
+  const notification = useSelector((state) => state.notification)
   const blogFormRef = useRef()
-  const byLikes = (b1, b2) => b2.likes>b1.likes ? 1 : -1
+  const dispatch = useDispatch()
+  const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs.sort(byLikes) )
-    )
+    blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)))
   }, [])
 
   useEffect(() => {
@@ -31,15 +34,19 @@ const App = () => {
   }, [])
 
   const login = async (username, password) => {
-    loginService.login({
-      username, password,
-    }).then(user => {
-      setUser(user)
-      userService.setUser(user)
-      notify(`${user.name} logged in!`)
-    }).catch(() => {
-      notify('wrong username/password', 'alert')
-    })
+    loginService
+      .login({
+        username,
+        password,
+      })
+      .then((user) => {
+        setUser(user)
+        userService.setUser(user)
+        notify(`${user.name} logged in!`)
+      })
+      .catch(() => {
+        notify('wrong username/password', 'alert')
+      })
   }
 
   const logout = () => {
@@ -49,61 +56,67 @@ const App = () => {
   }
 
   const createBlog = async (blog) => {
-    blogService.create(blog).then(createdBlog => {
-      notify(`a new blog '${createdBlog.title}' by ${createdBlog.author} added`)
-      setBlogs(blogs.concat(createdBlog))
-      blogFormRef.current.toggleVisibility()
-    }).catch(error => {
-      notify('creating a blog failed: ' + error.response.data.error, 'alert')
-    })
+    blogService
+      .create(blog)
+      .then((createdBlog) => {
+        notify(
+          `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
+        )
+        setBlogs(blogs.concat(createdBlog))
+        blogFormRef.current.toggleVisibility()
+      })
+      .catch((error) => {
+        notify('creating a blog failed: ' + error.response.data.error, 'alert')
+      })
   }
 
   const removeBlog = (id) => {
-    const toRemove = blogs.find(b => b.id === id)
+    const toRemove = blogs.find((b) => b.id === id)
 
-    const ok = window.confirm(`remove '${toRemove.title}' by ${toRemove.author}?`)
+    const ok = window.confirm(
+      `remove '${toRemove.title}' by ${toRemove.author}?`
+    )
 
     if (!ok) {
       return
     }
 
     blogService.remove(id).then(() => {
-      const updatedBlogs = blogs
-        .filter(b => b.id!==id)
-        .sort(byLikes)
+      const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
       setBlogs(updatedBlogs)
     })
   }
 
   const likeBlog = async (id) => {
-    const toLike = blogs.find(b => b.id === id)
+    const toLike = blogs.find((b) => b.id === id)
     const liked = {
       ...toLike,
-      likes: (toLike.likes||0) + 1,
-      user: toLike.user.id
+      likes: (toLike.likes || 0) + 1,
+      user: toLike.user.id,
     }
 
-    blogService.update(liked.id, liked).then(updatedBlog => {
+    blogService.update(liked.id, liked).then((updatedBlog) => {
       notify(`you liked '${updatedBlog.title}' by ${updatedBlog.author}`)
       const updatedBlogs = blogs
-        .map(b => b.id===id ? updatedBlog : b)
+        .map((b) => (b.id === id ? updatedBlog : b))
         .sort(byLikes)
       setBlogs(updatedBlogs)
     })
   }
 
-  const notify = (message, type='info') => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
+  // type='info' so type would be info if left blank
+  // seconds=5 so duration would be 5 if left blank
+  const notify = (message, type = 'info', seconds = 5) => {
+    dispatch(createNotification(message, type, seconds))
   }
 
   if (user === null) {
-    return <>
-      <Notification notification={notification} />
-      <LoginForm onLogin={login} />
-    </>
+    return (
+      <>
+        <Notification notification={notification} />
+        <LoginForm onLogin={login} />
+      </>
+    )
   }
 
   return (
@@ -117,14 +130,12 @@ const App = () => {
         <button onClick={logout}>logout</button>
       </div>
 
-      <Togglable buttonLabel='new note' ref={blogFormRef}>
-        <NewBlogForm
-          onCreate={createBlog}
-        />
+      <Togglable buttonLabel="new note" ref={blogFormRef}>
+        <NewBlogForm onCreate={createBlog} />
       </Togglable>
 
-      <div id='blogs'>
-        {blogs.map(blog =>
+      <div id="blogs">
+        {blogs.map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}
@@ -132,7 +143,7 @@ const App = () => {
             removeBlog={removeBlog}
             user={user}
           />
-        )}
+        ))}
       </div>
     </div>
   )
