@@ -6,8 +6,8 @@ const requestLogger = (request, response, next) => {
   logger.info('Method: ', request.method)
   logger.info('Path: ', request.path)
   logger.info('Body: ', request.body)
-  logger.info('User-agent'), request.get('User-Agent')
-  logger.info('Content-Type'), request.get('Content-Type')
+  logger.info('User-agent', request.get('User-Agent'))
+  logger.info('Content-Type', request.get('Content-Type'))
 
   logger.info('-----')
   next()
@@ -57,6 +57,6 @@ const unknownEndpoint = (reqquest, response) => {
 module.exports = {
   errorHandler,
   userExtractor,
-  requestLogger, 
-  unknownEndpoint
+  requestLogger,
+  unknownEndpoint,
 }

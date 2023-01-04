@@ -12,9 +12,13 @@ import userService from './services/user'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { createNotification } from './reducers/notificationReducer'
+import { initializeBlogs, createNewBlog } from './reducers/blogsReducer'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const state = useSelector(state => state)
+  console.log({state});
+  // const [blogs, setBlogs] = useState([])
+  const blogs = useSelector(state => state.blogs)
   const [user, setUser] = useState(null)
   // const [notification, setNotification] = useState(null)
   const notification = useSelector((state) => state.notification)
@@ -23,8 +27,9 @@ const App = () => {
   const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1)
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)))
-  }, [])
+    dispatch(initializeBlogs())
+    // blogService.getAll().then((blogs) => setBlogs(blogs.sort(byLikes)))
+  }, [dispatch])
 
   useEffect(() => {
     const userFromStorage = userService.getUser()
@@ -56,18 +61,20 @@ const App = () => {
   }
 
   const createBlog = async (blog) => {
-    blogService
-      .create(blog)
-      .then((createdBlog) => {
-        notify(
-          `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
-        )
-        setBlogs(blogs.concat(createdBlog))
-        blogFormRef.current.toggleVisibility()
-      })
-      .catch((error) => {
-        notify('creating a blog failed: ' + error.response.data.error, 'alert')
-      })
+    // blogService
+    //   .create(blog)
+    //   .then((createdBlog) => {
+    //     notify(
+    //       `a new blog '${createdBlog.title}' by ${createdBlog.author} added`
+    //     )
+        // setBlogs(blogs.concat(createdBlog))
+      //   blogFormRef.current.toggleVisibility()
+      // })
+      // .catch((error) => {
+      //   notify('creating a blog failed: ' + error.response.data.error, 'alert')
+      // })
+      dispatch(createNewBlog(blog))
+      blogFormRef.current.toggleVisibility()
   }
 
   const removeBlog = (id) => {
@@ -83,7 +90,8 @@ const App = () => {
 
     blogService.remove(id).then(() => {
       const updatedBlogs = blogs.filter((b) => b.id !== id).sort(byLikes)
-      setBlogs(updatedBlogs)
+      // setBlogs(updatedBlogs)
+
     })
   }
 
@@ -100,7 +108,7 @@ const App = () => {
       const updatedBlogs = blogs
         .map((b) => (b.id === id ? updatedBlog : b))
         .sort(byLikes)
-      setBlogs(updatedBlogs)
+      // setBlogs(updatedBlogs)
     })
   }
 

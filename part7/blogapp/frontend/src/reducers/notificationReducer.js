@@ -17,7 +17,9 @@ const { showNotification, hideNotification } = notificationSlice.actions
 
 let timeoutId = null
 
-export const createNotification = (notification, type, time) => {
+// type='info' so type would be info if left blank
+// seconds=5 so duration would be 5 if left blank
+export const createNotification = (notification, type = 'info', time = 5) => {
   return (dispatch) => {
     dispatch(showNotification({ message: notification, type: type }))
 
