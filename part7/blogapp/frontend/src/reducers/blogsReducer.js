@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs'
-import { createNotification } from './notificationReducer'
 
 const blogSlice = createSlice({
   name: 'blogs',
@@ -14,10 +13,18 @@ const blogSlice = createSlice({
       console.log({ action })
       return state.concat(action.payload)
     },
+    deleteBlog(state, action) {
+      return state.filter((b) => b.id !== action.payload).sort(byLikes)
+    },
+    likeBlog(state, action) {
+      return state
+        .map((b) => (b.id === action.payload.id ? action.payload : b))
+        .sort(byLikes)
+    },
   },
 })
 
-const { setBlogs, addNewBlog } = blogSlice.actions
+export const { setBlogs, addNewBlog, deleteBlog, likeBlog } = blogSlice.actions
 const byLikes = (b1, b2) => (b2.likes > b1.likes ? 1 : -1)
 
 export const initializeBlogs = () => {
@@ -28,26 +35,24 @@ export const initializeBlogs = () => {
 }
 
 export const createNewBlog = (blog) => {
+  return async () => {
+    const blogAsResponse = await blogService.create(blog)
+    console.log({ returnedBlog: blogAsResponse })
+    return blogAsResponse
+  }
+}
+
+export const removeBlog = (id) => {
   return async (dispatch) => {
-    try {
-      const blogAsResponse = await blogService.create(blog)
-      console.log({ blogAsResponse })
-      dispatch(addNewBlog(blogAsResponse))
-      dispatch(
-        createNotification(
-          `a new blog '${blogAsResponse.title}' by ${blogAsResponse.author} added`
-        )
-      )
-    } catch (error) {
-      console.log({ error })
-      dispatch(
-        createNotification(
-          'creating a blog failed: ' + error.response.data.error,
-          'alert',
-          5
-        )
-      )
-    }
+    await blogService.remove(id)
+    dispatch(deleteBlog(id))
+  }
+}
+
+export const addLikeToBlog = (id, updatedBlog) => {
+  return async (dispatch) => {
+    const blogAsResponse = await blogService.update(id, updatedBlog)
+    dispatch(likeBlog(blogAsResponse))
   }
 }
 
