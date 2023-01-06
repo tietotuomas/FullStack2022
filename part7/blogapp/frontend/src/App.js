@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -6,8 +6,6 @@ import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 
-import blogService from './services/blogs'
-import loginService from './services/login'
 import userService from './services/user'
 
 import { useDispatch, useSelector } from 'react-redux'
@@ -20,12 +18,14 @@ import {
   addLikeToBlog,
 } from './reducers/blogsReducer'
 
+import { loginUser, setUser, removeUser } from './reducers/userReducer'
+
 const App = () => {
   const state = useSelector((state) => state)
   console.log({ state })
 
   const blogs = useSelector((state) => state.blogs)
-  const [user, setUser] = useState(null)
+  const user = useSelector((state) => state.user)
 
   const notification = useSelector((state) => state.notification)
   const blogFormRef = useRef()
@@ -43,23 +43,19 @@ const App = () => {
   }, [])
 
   const login = async (username, password) => {
-    loginService
-      .login({
-        username,
-        password,
-      })
-      .then((user) => {
-        setUser(user)
-        userService.setUser(user)
-        notify(`${user.name} logged in!`)
-      })
-      .catch(() => {
-        notify('wrong username/password', 'alert')
-      })
+    try {
+      const userAsResponse = await dispatch(loginUser(username, password))
+      dispatch(setUser(userAsResponse))
+      userService.setUser(userAsResponse)
+      notify(`${userAsResponse.name} logged in!`)
+    } catch (error) {
+      console.log(error)
+      notify('wrong username/password', 'alert')
+    }
   }
 
   const logout = () => {
-    setUser(null)
+    dispatch(removeUser())
     userService.clearUser()
     notify('good bye!')
   }
@@ -93,11 +89,13 @@ const App = () => {
 
   const likeBlog = async (id) => {
     const toLike = blogs.find((b) => b.id === id)
+    console.log({ toLike })
     const liked = {
       ...toLike,
       likes: (toLike.likes || 0) + 1,
       user: toLike.user.id,
     }
+    console.log({ liked })
     dispatch(addLikeToBlog(id, liked))
 
     notify(`you liked '${liked.title}' by ${liked.author}`)
