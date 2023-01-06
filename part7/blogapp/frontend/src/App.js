@@ -1,10 +1,13 @@
-import { useEffect, useRef } from 'react'
+import React, { Fragment, useEffect, useRef } from 'react'
+
+import { Routes, Route } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import Users from './components/Users'
 
 import userService from './services/user'
 
@@ -37,10 +40,11 @@ const App = () => {
 
   useEffect(() => {
     const userFromStorage = userService.getUser()
+
     if (userFromStorage) {
-      setUser(userFromStorage)
+      dispatch(setUser(userFromStorage))
     }
-  }, [])
+  }, [dispatch])
 
   const login = async (username, password) => {
     try {
@@ -89,13 +93,13 @@ const App = () => {
 
   const likeBlog = async (id) => {
     const toLike = blogs.find((b) => b.id === id)
-    console.log({ toLike })
+    // ToLike has user object as a field.
+    // We want to dispatch a blog having user.id as a field. => user: toLike.user.id
     const liked = {
       ...toLike,
       likes: (toLike.likes || 0) + 1,
       user: toLike.user.id,
     }
-    console.log({ liked })
     dispatch(addLikeToBlog(id, liked))
 
     notify(`you liked '${liked.title}' by ${liked.author}`)
@@ -127,21 +131,31 @@ const App = () => {
         <button onClick={logout}>logout</button>
       </div>
 
-      <Togglable buttonLabel="new note" ref={blogFormRef}>
-        <NewBlogForm onCreate={createBlog} />
-      </Togglable>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Fragment>
+              <Togglable buttonLabel="new note" ref={blogFormRef}>
+                <NewBlogForm onCreate={createBlog} />
+              </Togglable>
+              <div id="blogs">
+                {blogs.map((blog) => (
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    likeBlog={likeBlog}
+                    removeBlog={deleteBlog}
+                    user={user}
+                  />
+                ))}
+              </div>
+            </Fragment>
+          }
+        />
 
-      <div id="blogs">
-        {blogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={likeBlog}
-            removeBlog={deleteBlog}
-            user={user}
-          />
-        ))}
-      </div>
+        <Route path="/users" element={<Users />} />
+      </Routes>
     </div>
   )
 }
