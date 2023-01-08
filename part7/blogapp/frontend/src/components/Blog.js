@@ -14,16 +14,6 @@ const Blog = ({ blog }) => {
       <Link to={`/blogs/${blog.id}`}>
         {blog.title} {blog.author}
       </Link>
-      {/* <button onClick={() => setVisible(!visible)}>
-        {visible ? 'hide' : 'view'}
-      </button>
-      <BlogDetails
-        blog={blog}
-        visible={visible}
-        likeBlog={likeBlog}
-        removeBlog={removeBlog}
-        own={blog.user && user.username===blog.user.username}
-      /> */}
     </div>
   )
 }
