@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState, useRef } from 'react'
 
-import { Routes, Route, useMatch } from 'react-router-dom'
+import { Routes, Route, useMatch, useNavigate, Link } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -9,6 +9,7 @@ import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
 import User from './components/User'
+import BlogDetails from './components/BlogDetails'
 
 import userService from './services/user'
 import usersService from './services/users'
@@ -36,13 +37,16 @@ const App = () => {
   const blogFormRef = useRef()
   const dispatch = useDispatch()
 
-  const match = useMatch('/users/:id')
+  const matchUsers = useMatch('/users/:id')
+  const matchBlogs = useMatch('/blogs/:id')
+  const matchUsersRoute = useMatch('/users')
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
 
   useEffect(() => {
     console.log('useEffect fetching users invoked!')
     usersService.getAll().then((initialUsers) => setUsers(initialUsers))
-  }, [])
+  }, [matchUsersRoute])
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -98,6 +102,7 @@ const App = () => {
       return
     }
     dispatch(removeBlog(id))
+    navigate('/')
     notify(`'${toRemove.title}' by ${toRemove.author} was deleted successfully`)
   }
 
@@ -121,10 +126,16 @@ const App = () => {
     dispatch(createNotification(message, type, seconds))
   }
 
-  const userMatch = match
-    ? users.find((u) => u.id === match.params.id)
+  const userMatch = matchUsers
+    ? users.find((u) => u.id === matchUsers.params.id)
     : null
-  console.log({ userMatch })
+
+  const blogMatch = matchBlogs
+    ? blogs.find((b) => b.id === matchBlogs.params.id)
+    : { user: null } // so own={blogMatch.user doesn't cast an error
+
+  const padding = { padding: 5 }
+  const background = { backgroundColor: '#F8D7D9' }
 
   if (user === null) {
     return (
@@ -137,14 +148,24 @@ const App = () => {
 
   return (
     <div>
+      <div style={background}>
+        <Link style={padding} to="/">
+          blogs
+        </Link>
+        <Link style={padding} to="/users">
+          users
+        </Link>
+        <span style={padding}>
+          {user.name} logged in
+          <button style={{ marginLeft: '10px' }} onClick={logout}>
+            logout
+          </button>
+        </span>
+      </div>
       <h2>blogs</h2>
 
       <Notification notification={notification} />
 
-      <div>
-        {user.name} logged in
-        <button onClick={logout}>logout</button>
-      </div>
       <br />
 
       <Routes>
@@ -152,18 +173,12 @@ const App = () => {
           path="/"
           element={
             <Fragment>
-              <Togglable buttonLabel="new note" ref={blogFormRef}>
+              <Togglable buttonLabel="new blog" ref={blogFormRef}>
                 <NewBlogForm onCreate={createBlog} />
               </Togglable>
               <div id="blogs">
                 {blogs.map((blog) => (
-                  <Blog
-                    key={blog.id}
-                    blog={blog}
-                    likeBlog={likeBlog}
-                    removeBlog={deleteBlog}
-                    user={user}
-                  />
+                  <Blog key={blog.id} blog={blog} />
                 ))}
               </div>
             </Fragment>
@@ -172,6 +187,17 @@ const App = () => {
 
         <Route path="/users" element={<Users users={users} />} />
         <Route path="/users/:id" element={<User user={userMatch} />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <BlogDetails
+              blog={blogMatch}
+              likeBlog={likeBlog}
+              removeBlog={deleteBlog}
+              own={blogMatch.user && user.username === blogMatch.user.username}
+            />
+          }
+        />
       </Routes>
     </div>
   )
