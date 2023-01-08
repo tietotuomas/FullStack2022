@@ -1,14 +1,7 @@
-import usersService from '../services/users'
-import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
-const Users = () => {
-  const [users, setUsers] = useState([])
-  useEffect(() => {
-    console.log('useEffect inside Users-component invoked!')
-    usersService.getAll().then((initialUsers) => setUsers(initialUsers))
-  }, [])
-
-  console.log({users});
+const Users = ({ users }) => {
+  console.log({ users })
 
   return (
     <table>
@@ -21,7 +14,7 @@ const Users = () => {
       <tbody>
         {users.map((user) => (
           <tr key={user.id}>
-            <td>{user.name}</td>
+            <td>{<Link to={`/users/${user.id}`}>{user.name}</Link>}</td>
             <td>{user.blogs.length}</td>
           </tr>
         ))}

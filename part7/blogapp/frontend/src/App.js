@@ -1,6 +1,6 @@
-import React, { Fragment, useEffect, useRef } from 'react'
+import React, { Fragment, useEffect, useState, useRef } from 'react'
 
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useMatch } from 'react-router-dom'
 
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -8,8 +8,10 @@ import NewBlogForm from './components/NewBlogForm'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
+import User from './components/User'
 
 import userService from './services/user'
+import usersService from './services/users'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { createNotification } from './reducers/notificationReducer'
@@ -33,6 +35,14 @@ const App = () => {
   const notification = useSelector((state) => state.notification)
   const blogFormRef = useRef()
   const dispatch = useDispatch()
+
+  const match = useMatch('/users/:id')
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    console.log('useEffect fetching users invoked!')
+    usersService.getAll().then((initialUsers) => setUsers(initialUsers))
+  }, [])
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -111,6 +121,11 @@ const App = () => {
     dispatch(createNotification(message, type, seconds))
   }
 
+  const userMatch = match
+    ? users.find((u) => u.id === match.params.id)
+    : null
+  console.log({ userMatch })
+
   if (user === null) {
     return (
       <>
@@ -130,6 +145,7 @@ const App = () => {
         {user.name} logged in
         <button onClick={logout}>logout</button>
       </div>
+      <br />
 
       <Routes>
         <Route
@@ -154,7 +170,8 @@ const App = () => {
           }
         />
 
-        <Route path="/users" element={<Users />} />
+        <Route path="/users" element={<Users users={users} />} />
+        <Route path="/users/:id" element={<User user={userMatch} />} />
       </Routes>
     </div>
   )
