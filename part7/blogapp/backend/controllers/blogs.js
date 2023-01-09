@@ -4,9 +4,9 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 router.get('/', async (request, response) => {
-  const notes = await Blog
+  const notes = await Blog.find({})
     .find({})
-    .find({}).populate('user', { username: 1, name: 1 })
+    .populate('user', { username: 1, name: 1 })
 
   response.json(notes)
 })
@@ -24,22 +24,23 @@ router.post('/', async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  const blogToReturn = await Blog
-    .findById(savedBlog._id)
-    .populate('user', { username: 1, name: 1 })
+  const blogToReturn = await Blog.findById(savedBlog._id).populate('user', {
+    username: 1,
+    name: 1,
+  })
 
   response.status(201).json(blogToReturn)
 })
 
 router.delete('/:id', async (request, response) => {
   const blogToDelete = await Blog.findById(request.params.id)
-  if (!blogToDelete ) {
+  if (!blogToDelete) {
     return response.status(204).end()
   }
 
-  if ( blogToDelete.user && blogToDelete.user.toString() !== request.user.id ) {
+  if (blogToDelete.user && blogToDelete.user.toString() !== request.user.id) {
     return response.status(401).json({
-      error: 'only the creator can delete a blog'
+      error: 'only the creator can delete a blog',
     })
   }
 
@@ -51,13 +52,24 @@ router.delete('/:id', async (request, response) => {
 router.put('/:id', async (request, response) => {
   const blog = request.body
 
-  const updatedBlog = await Blog
-    .findByIdAndUpdate(
-      request.params.id, 
-      blog, 
-      { new: true, runValidators: true, context: 'query' }
-    ).populate('user', { username: 1, name: 1 })
-      
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  }).populate('user', { username: 1, name: 1 })
+
+  response.json(updatedBlog)
+})
+
+router.put('/:id/comments', async (request, response) => {
+  const blog = request.body
+
+  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  }).populate('user', { username: 1, name: 1 })
+
   response.json(updatedBlog)
 })
 

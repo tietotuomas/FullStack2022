@@ -21,7 +21,7 @@ import {
   createNewBlog,
   addNewBlog,
   removeBlog,
-  addLikeToBlog,
+  addUpdateToBlog,
 } from './reducers/blogsReducer'
 
 import { loginUser, setUser, removeUser } from './reducers/userReducer'
@@ -115,9 +115,21 @@ const App = () => {
       likes: (toLike.likes || 0) + 1,
       user: toLike.user.id,
     }
-    dispatch(addLikeToBlog(id, liked))
+    dispatch(addUpdateToBlog(id, liked))
 
     notify(`you liked '${liked.title}' by ${liked.author}`)
+  }
+
+  const addNewComment = (comment, id) => {
+    const toBeUpdated = blogs.find((b) => b.id === id)
+    const updated = {
+      ...toBeUpdated,
+      comments: toBeUpdated.comments.concat(comment),
+      user: toBeUpdated.user.id,
+    }
+    dispatch(addUpdateToBlog(id, updated))
+
+    console.log(comment)
   }
 
   // type='info' so type would be info if left blank
@@ -132,7 +144,7 @@ const App = () => {
 
   const blogMatch = matchBlogs
     ? blogs.find((b) => b.id === matchBlogs.params.id)
-    : { user: null } // so own={blogMatch.user doesn't cast an error
+    : { user: null } // so own={blogMatch.user... doesn't cast an error
 
   const padding = { padding: 5 }
   const background = { backgroundColor: '#F8D7D9' }
@@ -162,7 +174,7 @@ const App = () => {
           </button>
         </span>
       </div>
-      <h2>blogs</h2>
+      <h1>Blog app</h1>
 
       <Notification notification={notification} />
 
@@ -195,6 +207,7 @@ const App = () => {
               likeBlog={likeBlog}
               removeBlog={deleteBlog}
               own={blogMatch.user && user.username === blogMatch.user.username}
+              addNewComment={addNewComment}
             />
           }
         />

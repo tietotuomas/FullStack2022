@@ -49,7 +49,7 @@ export const removeBlog = (id) => {
   }
 }
 
-export const addLikeToBlog = (id, updatedBlog) => {
+export const addUpdateToBlog = (id, updatedBlog) => {
   return async (dispatch) => {
     const blogAsResponse = await blogService.update(id, updatedBlog)
     dispatch(likeBlog(blogAsResponse))
