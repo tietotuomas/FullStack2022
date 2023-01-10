@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Button, TextField } from '@mui/material'
+import { AppBar, Toolbar, Typography } from '@material-ui/core'
 
 const NewBlogForm = ({ onCreate }) => {
   const [title, setTitle] = useState('')
@@ -15,12 +17,17 @@ const NewBlogForm = ({ onCreate }) => {
 
   return (
     <div>
-      <h2>Create new</h2>
+      <AppBar position="static" style={{ backgroundColor: 'pink' }}>
+        <Toolbar>
+          <Typography style={{ color: 'purple' }} variant="subtitle2">
+            Create
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
       <form onSubmit={handleSubmit}>
         <div>
-          title
-          <input
+          <TextField
             value={title}
             onChange={({ target }) => setTitle(target.value)}
             id="title"
@@ -28,8 +35,7 @@ const NewBlogForm = ({ onCreate }) => {
           />
         </div>
         <div>
-          author
-          <input
+          <TextField
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
             id="author"
@@ -37,17 +43,21 @@ const NewBlogForm = ({ onCreate }) => {
           />
         </div>
         <div>
-          url
-          <input
+          <TextField
             value={url}
             onChange={({ target }) => setUrl(target.value)}
             id="url"
             placeholder="url of the blog"
           />
         </div>
-        <button id="create-button" type="submit">
+        <Button
+          variant="contained"
+          color="secondary"
+          id="create-button"
+          type="submit"
+        >
           create
-        </button>
+        </Button>
       </form>
     </div>
   )

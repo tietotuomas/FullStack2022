@@ -23,6 +23,13 @@ import {
   removeBlog,
   addUpdateToBlog,
 } from './reducers/blogsReducer'
+import { AppBar, Toolbar, Typography } from '@material-ui/core'
+
+import { Container } from '@mui/system'
+
+import { Table, TableBody, TableContainer, Paper } from '@mui/material'
+
+import { makeStyles } from '@mui/styles'
 
 import { loginUser, setUser, removeUser } from './reducers/userReducer'
 
@@ -148,18 +155,28 @@ const App = () => {
 
   const padding = { padding: 5 }
   const background = { backgroundColor: '#F8D7D9' }
+  const useStyles = makeStyles({
+    table: {
+      backgroundColor: 'pink',
+      color: 'white',
+    },
+    tableBody: {
+      backgroundColor: 'white',
+    },
+  })
+  const classes = useStyles()
 
   if (user === null) {
     return (
-      <>
+      <Container>
         <Notification notification={notification} />
         <LoginForm onLogin={login} />
-      </>
+      </Container>
     )
   }
 
   return (
-    <div>
+    <Container>
       <div style={background}>
         <Link style={padding} to="/">
           blogs
@@ -174,7 +191,11 @@ const App = () => {
           </button>
         </span>
       </div>
-      <h1>Blog app</h1>
+      <AppBar position="static" style={{ backgroundColor: 'pink' }}>
+        <Toolbar>
+          <Typography variant="h6">Blog App</Typography>
+        </Toolbar>
+      </AppBar>
 
       <Notification notification={notification} />
 
@@ -188,11 +209,16 @@ const App = () => {
               <Togglable buttonLabel="new blog" ref={blogFormRef}>
                 <NewBlogForm onCreate={createBlog} />
               </Togglable>
-              <div id="blogs">
-                {blogs.map((blog) => (
-                  <Blog key={blog.id} blog={blog} />
-                ))}
-              </div>
+
+              <TableContainer component={Paper} className={classes.table}>
+                <Table>
+                  <TableBody className={classes.tableBody}>
+                    {blogs.map((blog) => (
+                      <Blog key={blog.id} blog={blog} table={classes.table} />
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Fragment>
           }
         />
@@ -212,7 +238,7 @@ const App = () => {
           }
         />
       </Routes>
-    </div>
+    </Container>
   )
 }
 
